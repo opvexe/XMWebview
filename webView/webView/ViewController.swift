@@ -17,6 +17,7 @@ class ViewController: UIViewController {
         webView.scrollView.bounces = false
         webView.delegate = self
         webView.scalesPageToFit = true      ///MARK: 缩小至屏幕宽度
+//        webView.dataDetectorTypes = UIDataDetectorTypeNone
         webView.loadRequest(URLRequest.init(url: URL.init(string: "http://app.digitaling.com/articles/39581.html")!))
         return webView
     }()
@@ -39,6 +40,18 @@ class ViewController: UIViewController {
     
     deinit {
         print("释放内存")
+        self.webView.loadHTMLString("", baseURL: nil)
+        self.webView.stopLoading()
+        self.webView.delegate = nil
+        self.webView.removeFromSuperview()
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        URLCache.shared.removeAllCachedResponses()
+        URLCache.shared.diskCapacity = 0
+        URLCache.shared.memoryCapacity = 0
+        URLCache.shared.removeCachedResponse(for: self.webView.request!)
     }
 }
 
@@ -49,6 +62,9 @@ extension ViewController: UIWebViewDelegate{
         UserDefaults.standard.set(false, forKey: "WebKitDiskImageCacheEnabled")
         UserDefaults.standard.set(false, forKey: "WebKitOfflineWebApplicationCacheEnabled")
         UserDefaults.standard.synchronize()
+    }
+    func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+        return true
     }
 }
 ///MARK: WebviewDelegte
